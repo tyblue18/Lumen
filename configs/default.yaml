@@ -1,0 +1,62 @@
+# Paths
+data_dir: data/raw/BraTS2020_TrainingData
+run_dir: runs/default
+
+# Dataset
+dataset_version: BraTS2020
+train_val_split: 0.8
+num_workers: 4
+
+# Architecture
+model:
+  in_channels: 4
+  out_channels: 3
+  channels: [32, 64, 128, 256, 320]
+  strides: [2, 2, 2, 2]
+  num_res_units: 2
+
+# Patch-based training
+patch_size: [96, 96, 96]
+samples_per_volume: 2
+
+# Training
+batch_size: 2
+epochs: 100
+val_frequency: 1
+
+# Optimizer: AdamW
+optimizer:
+  name: AdamW
+  lr: 1.0e-4
+  weight_decay: 1.0e-5
+
+# Scheduler: CosineAnnealingLR
+scheduler:
+  name: CosineAnnealingLR
+  T_max: 100
+
+# Loss: DiceCELoss with sigmoid heads (not softmax — regions overlap)
+loss:
+  name: DiceCELoss
+  sigmoid: true
+  squared_pred: true
+  to_onehot_y: false
+
+# Augmentations
+augmentation:
+  random_flip: true
+  flip_axes: [0, 1, 2]
+  rand_scale_intensity_prob: 0.1
+  rand_shift_intensity_prob: 0.1
+  foreground_crop: true
+
+# Mixed precision (AMP)
+amp: true
+
+# Inference
+sliding_window_roi: [96, 96, 96]
+sliding_window_overlap: 0.5
+
+# Experiment tracking
+use_wandb: false
+wandb_project: brats-segmentation
