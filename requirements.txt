@@ -1,6 +1,6 @@
 torch>=2.1
 torchvision>=0.16
-monai[all]>=1.3
+monai>=1.3
 nibabel>=5.0
 numpy>=1.24
 matplotlib>=3.7

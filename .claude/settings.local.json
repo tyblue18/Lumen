@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(.venv\\\\Scripts\\\\python.exe -m pip install torch torchvision --index-url https://download.pytorch.org/whl/cu128 2>&1)",
+      "PowerShell(.venv\\\\Scripts\\\\python.exe -m pip install monai[all] nibabel numpy matplotlib pyyaml tqdm streamlit scikit-image einops pytest 2>&1)",
+      "PowerShell(.venv\\\\Scripts\\\\python.exe -m pip install monai nibabel numpy matplotlib pyyaml tqdm streamlit scikit-image einops pytest 2>&1)"
+    ]
+  }
+}
