@@ -10,3 +10,4 @@ streamlit>=1.30
 scikit-image>=0.21
 einops>=0.7
 pytest>=7.4
+scipy
