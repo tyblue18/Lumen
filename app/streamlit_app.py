@@ -37,64 +37,52 @@ st.set_page_config(
 # ─────────────────────────────────────────────────────────────────────────────
 # CSS + Google Fonts
 # ─────────────────────────────────────────────────────────────────────────────
-st.markdown("""
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
-      rel="stylesheet">
-<style>
-/* ── Typography ─────────────────────────────────────────────── */
+st.markdown(
+    '<link rel="preconnect" href="https://fonts.googleapis.com">'
+    '<link href="https://fonts.googleapis.com/css2?family=Inter'
+    ':wght@400;500;600;700;800&display=swap" rel="stylesheet">',
+    unsafe_allow_html=True,
+)
+st.markdown("""<style>
 html, body, [class*="st-"], .stApp, p, span, div, label, button {
     font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
 }
 h1, h2, h3, h4 {
     font-weight: 700 !important;
     letter-spacing: -0.02em !important;
-    line-height:    1.15 !important;
+    line-height: 1.15 !important;
 }
-/* body text */
 p, .stMarkdown p { font-size: 15px; line-height: 1.6; }
-
-/* ── Layout ─────────────────────────────────────────────────── */
 .main .block-container {
-    padding-top:    1.75rem !important;
-    padding-bottom: 4rem    !important;
-    max-width:      1380px  !important;
+    padding-top: 1.75rem !important;
+    padding-bottom: 4rem !important;
+    max-width: 1380px !important;
 }
-/* Sidebar interior */
 [data-testid="stSidebar"] > div:first-child {
     border-right: 1px solid rgba(255,255,255,0.06);
 }
-
-/* ── Bordered containers (image cards, table card) ──────────── */
 [data-testid="stVerticalBlockBorderWrapper"] {
-    border:        1px solid #26262b !important;
+    border: 1px solid #26262b !important;
     border-radius: 12px !important;
-    background:    #141417 !important;
+    background: #141417 !important;
 }
-/* Columns inside bordered containers: remove default gap/padding */
-[data-testid="stVerticalBlockBorderWrapper"]
-  [data-testid="stHorizontalBlock"] { gap: 12px !important; }
-
-/* ── Slice caption below each image ─────────────────────────── */
+[data-testid="stVerticalBlockBorderWrapper"] [data-testid="stHorizontalBlock"] {
+    gap: 12px !important;
+}
 .slice-label {
-    font-size:      11px;
-    color:          #6b7280;
-    text-align:     center;
-    margin-top:     6px;
+    font-size: 11px;
+    color: #6b7280;
+    text-align: center;
+    margin-top: 6px;
     letter-spacing: 0.05em;
     text-transform: uppercase;
-    font-weight:    500;
+    font-weight: 500;
 }
-/* ── Image white-background pads (medical convention) ───────── */
 [data-testid="stImage"] img {
     background: #ffffff;
     border-radius: 6px;
 }
-
-/* ── Slider ─────────────────────────────────────────────────── */
 [data-testid="stSlider"] { padding-bottom: 0.5rem; }
-
-/* ── Download button ─────────────────────────────────────────── */
 [data-testid="stDownloadButton"] button {
     border: 1px solid #26262b !important;
     background: transparent !important;
@@ -104,8 +92,7 @@ p, .stMarkdown p { font-size: 15px; line-height: 1.6; }
     border-color: #10b981 !important;
     color: #10b981 !important;
 }
-</style>
-""", unsafe_allow_html=True)
+</style>""", unsafe_allow_html=True)
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Helpers
@@ -404,7 +391,6 @@ if not has_results:
             sample_trigger = st.button(
                 "🧪  Try Lumen with sample patient (BraTS_001)",
                 type="primary",
-                use_container_width=True,
                 key="sample_cta",
             )
             st.markdown(
@@ -423,7 +409,6 @@ if not has_results:
             )
             run_trigger = st.button(
                 "Run inference on uploaded files",
-                use_container_width=True,
                 key="run_cta",
             )
         elif not all_uploaded:
@@ -440,7 +425,6 @@ else:
         if _has_sample and model is not None:
             sample_trigger = st.button(
                 "Re-run sample",
-                use_container_width=True,
                 key="sample_rerun",
             )
     with c2:
@@ -448,7 +432,6 @@ else:
             "Run inference",
             type="primary",
             disabled=not (all_uploaded and model is not None),
-            use_container_width=True,
             key="run_rerun",
         )
 
@@ -531,20 +514,20 @@ if "seg" in st.session_state:
     with st.container(border=True):
         cols = st.columns(3 if has_gt else 2)
         with cols[0]:
-            st.image(_render_slice(flair_slice, None), use_container_width=True)
+            st.image(_render_slice(flair_slice, None))
             st.markdown(
                 f'<div class="slice-label">FLAIR &nbsp;·&nbsp; slice {d}/{depth-1}</div>',
                 unsafe_allow_html=True,
             )
         if has_gt:
             with cols[1]:
-                st.image(_render_slice(flair_slice, gt_slice), use_container_width=True)
+                st.image(_render_slice(flair_slice, gt_slice))
                 st.markdown(
                     f'<div class="slice-label">Ground truth &nbsp;·&nbsp; slice {d}</div>',
                     unsafe_allow_html=True,
                 )
         with cols[-1]:
-            st.image(_render_slice(flair_slice, seg[:, :, d]), use_container_width=True)
+            st.image(_render_slice(flair_slice, seg[:, :, d]))
             st.markdown(
                 f'<div class="slice-label">Prediction &nbsp;·&nbsp; slice {d}</div>',
                 unsafe_allow_html=True,
