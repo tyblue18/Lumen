@@ -75,6 +75,8 @@ def parse_args() -> argparse.Namespace:
                    help="Path to a last.pt checkpoint to resume from")
     p.add_argument("--subset",   default=None,
                    help="Path to a smaller data directory for quick smoke runs")
+    p.add_argument("--epochs",   type=int, default=None,
+                   help="Override epochs from config (useful for smoke runs)")
     return p.parse_args()
 
 
@@ -87,6 +89,8 @@ def main() -> None:
         cfg["data_dir"] = args.subset
     if args.run_name:
         cfg["run_dir"] = f"runs/{args.run_name}"
+    if args.epochs is not None:
+        cfg["epochs"] = args.epochs
 
     data_dir = Path(cfg["data_dir"])
     run_dir  = Path(cfg["run_dir"])

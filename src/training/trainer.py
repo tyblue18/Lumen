@@ -78,15 +78,29 @@ class Trainer:
     def fit(self) -> None:
         n_epochs = self.config["epochs"]
         val_freq = self.config.get("val_frequency", 1)
+        on_gpu = self.device.type == "cuda"
 
         for epoch in range(self.start_epoch, n_epochs + 1):
             t0 = time.monotonic()
+
+            if on_gpu:
+                torch.cuda.reset_peak_memory_stats(self.device)
             train_loss = self._train_epoch(epoch, n_epochs)
-            self.scheduler.step()
+            peak_train_mb = (
+                torch.cuda.max_memory_allocated(self.device) / 1024 ** 2
+                if on_gpu else None
+            )
 
             val_scores: dict | None = None
+            peak_val_mb: float | None = None
             if epoch % val_freq == 0 and self.val_loader is not None:
+                if on_gpu:
+                    torch.cuda.reset_peak_memory_stats(self.device)
                 val_scores = self._val_epoch(epoch, n_epochs)
+                if on_gpu:
+                    peak_val_mb = (
+                        torch.cuda.max_memory_allocated(self.device) / 1024 ** 2
+                    )
 
             elapsed = time.monotonic() - t0
 
@@ -98,7 +112,8 @@ class Trainer:
                     is_best = True
 
             self._save_checkpoint(epoch, is_best)
-            self._log_epoch(epoch, train_loss, val_scores, elapsed)
+            self._log_epoch(epoch, train_loss, val_scores, elapsed,
+                            peak_train_mb, peak_val_mb)
 
     # ------------------------------------------------------------------
     # Internal helpers
@@ -178,6 +193,8 @@ class Trainer:
         train_loss: float,
         val_scores: dict | None,
         elapsed_s: float,
+        peak_train_mb: float | None,
+        peak_val_mb: float | None,
     ) -> None:
         entry: dict = {
             "epoch": epoch,
@@ -185,6 +202,10 @@ class Trainer:
             "lr": round(self.optimizer.param_groups[0]["lr"], 8),
             "time_s": round(elapsed_s, 1),
         }
+        if peak_train_mb is not None:
+            entry["peak_train_vram_mb"] = round(peak_train_mb, 0)
+        if peak_val_mb is not None:
+            entry["peak_val_vram_mb"] = round(peak_val_mb, 0)
         if val_scores is not None:
             for region, dice in val_scores.items():
                 entry[f"val_{region}"] = round(float(dice), 6)
@@ -199,9 +220,12 @@ class Trainer:
 
         # Console summary
         parts = [f"epoch {epoch}  loss={train_loss:.4f}"]
+        if peak_train_mb is not None:
+            parts.append(f"VRAM={peak_train_mb/1024:.2f}GB")
         if val_scores:
             for k, v in val_scores.items():
                 parts.append(f"{k}={float(v):.4f}")
+        parts.append(f"time={elapsed_s:.0f}s")
         print("  " + "  ".join(parts))
 
         if self.use_wandb:
